@@ -1,0 +1,87 @@
+swagger: '2.0'
+info:
+  title: H1B LCA Classification API
+  version: "1.0"
+  description: H-1B visas are a category of employment-based, non-immigrant visas for temporary foreign workers in the United States.
+   For a foreign national to apply for an H-1B visa, a US employer must offer them a job and submit a petition for a H-1B visa to the 
+   US immigration department. This is also the most common visa status applied for and held by international students once they 
+   complete college or higher education and begin working in a full-time position. Since the final H-1B allotment process is now via 
+   a lottery process, we cannot predict the outcome. However, prior to filing a H-1B petition, the company 
+   files a LCA – Labor Condition Application – with the USCIS for any non-immigrant worker. It is very important f
+   or a foreign worker as it protects their fundamental rights at work location in terms of wages, working conditions and 
+   policies. Predicting the outcome of the LCA application to be certified or not can help both candidates and the employers with 
+   an accurate assessment of what to expect in the application process. This is an API that predicts the status (CERTIFIED OR DENIED) of an LCA application
+   depending upon a variety of important factors. 
+
+
+paths:
+  /health:
+    get:
+      summary: Checks the health of the service
+      description: Returns the health status of the service
+      operationId: h1b_lca_classification_api.health
+      responses:
+        '200':
+          description: Service is healthy
+        '500':
+          description: Service is unhealthy
+
+  /predict:
+    post:
+      summary: Entrypoint to our prediction function
+      operationId: h1b_lca_classification_api.predict
+      consumes:
+      - multipart/form-data
+      produces:
+      - application/json
+      parameters:
+        - in: query
+          name: "full_time_position"
+          type: "string"
+          enum: [ "Y", "N"]
+          description: "If you are employed full time, choose Y. If not, choose N. "
+          required: true  
+        - in: query
+          name: "state"
+          type: "string"
+          enum: ["ALABAMA","ALASKA","ARIZONA","ARKANSAS","CALIFORNIA","COLORADO",
+          "CONNECTICUT","DELAWARE","DISTRICT OF COLUMBIA","FLORIDA","GEORGIA",
+          "HAWAII","IDAHO","ILLINOIS","INDIANA","IOWA","KANSAS","KENTUCKY",
+          "LOUISIANA","MAINE","MARYLAND","MASSACHUSETTS","MICHIGAN","MINNESOTA",
+          "MISSISSIPPI","MISSOURI","MONTANA","NA","NEBRASKA","NEVADA","NEW HAMPSHIRE",
+          "NEW JERSEY","NEW MEXICO","NEW YORK","NORTH CAROLINA","NORTH DAKOTA","OHIO",
+          "OKLAHOMA","OREGON","PENNSYLVANIA","PUERTO RICO","RHODE ISLAND","SOUTH CAROLINA",
+          "SOUTH DAKOTA","TENNESSEE","TEXAS","UTAH","VERMONT","VIRGINIA","WASHINGTON",
+          "WEST VIRGINIA","WISCONSIN","WYOMING"]
+          description: "Please select the state you are currently employed in. Choose NA if you do not include state in your address."
+          required: true
+        - in: query
+          name: "employer"
+          type: "string"
+          enum: ["ACCENTURE LLP","COGNIZANT TECHNOLOGY SOLUTIONS U.S. CORPORATION",
+          "Ernst & Young U.S. LLP","HCL AMERICA INC","IBM NDIA PRIVATE LIMITED",
+          "INFOSYS LIMITED","MICROSOFT CORPORATION","TATA CONSULTANCY SERVICES LIMITED",
+          "WIPRO LIMITED","OTHERS"]
+          description: "Please choose your current employer."
+          required: true
+        - in: query
+          name: "occupation"
+          type: "string"
+          enum: ["EDUCATIONAL INSTRUCTION AND LIBRARY OCCUPATIONS",
+          "ADVANCED SCIENCES","ARCHITECTURE AND ENGINEERING OCCUPATIONS",
+          "BUSINESS AND FINANCIAL OCCUPATIONS",
+          "COMPUTER AND MATHEMATICAL OCCUPATIONS","MANAGEMENT OCCUPATIONS",
+          "MARKETING OCCUPATIONS",
+          "MEDICAL OR HEALTHCARE SUPPORT OCCUPATIONS","OTHERS"]
+          description: "Choose the of the Occupation(SOC_NAME) your job falls in."
+          required: true
+        - in: formData
+          name: "prevailing_wage" 
+          required: true
+          description: "The prevailing wage for a job position is defined as the average wage paid to similarly employed workers in the requested occupation in the area of intended employment."
+          type: number
+      responses:
+        '200':
+          description: Classification performed successfully
+        '500':
+          description: Unable to perform the classification
